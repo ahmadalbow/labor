@@ -166,7 +166,19 @@ def set_power(request):
         return JsonResponse(response_data, status=200)
     except json.JSONDecodeError as e:
         return JsonResponse({'error': 'Invalid JSON data'}, status=400)  
-
+@api_view(['POST'])
+def set_volt(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+        ip = data.get('ip')
+        ch = data.get("ch")
+        volt = float(data.get("volt"))
+        hmp4040 = main.get_device(ip)
+        hmp4040.set_volt(ch,volt)
+        response_data = {}
+        return JsonResponse(response_data, status=200)
+    except json.JSONDecodeError as e:
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)  
 @api_view(['GET'])
 def read_voltage(request):
     try:

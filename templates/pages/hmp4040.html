@@ -276,13 +276,7 @@
         const last4Characters = inputString.slice(-4);
       
         // Convert the last 4 characters to an integer and add 1
-        try {
-            const last4Int = parseInt(last4Characters, 10);
-        }
-        catch (error){
-            document.getElementById("strahlernummer").style.borderColor = "red"
-            return false
-        }
+        const last4Int = parseInt(last4Characters, 10);
         const modifiedInt = last4Int + 1;
       
         // Remove the last 4 characters from the original string
@@ -331,7 +325,23 @@
         })
     
     }
-
+    function setVoltReq(ip, ch, volt) {
+        // Prepare the data to be sent in the POST request
+        var data = {
+            ip: ip,
+            ch: ch,
+            volt: volt
+        };
+    
+        // Perform the POST request using the Fetch API or another library of your choice
+        return fetch("/api/set_volt/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+    }
       
       // Function to send a request to read voltage
       function readVoltageReq(ip) {
@@ -377,15 +387,12 @@
           if (progress === 0) {
             clearInterval(interval); // Stop the interval when progress is 0
             updateStatus(); // Call your "tsss" function
-            status.textContent = "Messugn fertig."
+            setVoltReq(ipAddress,1,0.1)
+            status.textContent = "Messung fertig."
           }
-          else if(isNaN(progress)){
-            clearInterval(interval);
-            
-          }
+          
           else {
-            status.textContent = "Messugn läuft " + progress + "%."
-
+            status.textContent = "Messung läuft " + progress + "%."
           }
         }
       
