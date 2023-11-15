@@ -242,7 +242,6 @@ def get_progressBar(request):
         path = '/OpusCommand.htm?GET_PROGRESSBAR'
         prog = get_url_data(url, port, path).split('\n')[2].replace("\r", "")
         response_data = {'prog' : prog}
-        print(response_data)
         return JsonResponse(response_data, status=200)
 
     except json.JSONDecodeError as e:
