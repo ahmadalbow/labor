@@ -46,18 +46,20 @@ class GereateManager:
            connected_ip_addresses = [ip for ip, result in zip(ip_addresses, results) if result]
            for r in connected_ip_addresses:
                result.append(('DMM6500',r))
+        
         import glob
-
-        usb_devices = glob.glob('/dev/ttyUSB*')
-
-        if usb_devices:
-            for device in usb_devices:
-                try:
-                    j = jds6600(device)        
-                    j.getinfo_devicetype()           
-                    result.append(('JDS6600',device))
-                except:
-                    pass
+        os_name = platform.system()
+            # Check if the operating system is Windows
+        if os_name == 'Linux':            
+            usb_devices = glob.glob('/dev/ttyUSB*')
+            if usb_devices:
+                for device in usb_devices:
+                    try:
+                        j = jds6600(device)        
+                        j.getinfo_devicetype()           
+                        result.append(('JDS6600',device))
+                    except:
+                        pass
         return result
 
 
