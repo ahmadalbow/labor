@@ -1,0 +1,471 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block container %}
+<style>
+    .popup {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        overflow: auto;
+    }
+    
+    .popup-content {
+        background-color: #fff;
+        margin: 350px auto;
+        padding: 30px;
+        width: 30%;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+        border-radius : 7px;
+    }
+
+    .tab {
+        overflow: hidden;
+    }
+    
+    .tab button {
+        font-weight: 600;
+        outline: none;
+        background-color: white;
+        border : none;
+        transition: 0.3s;
+    }
+    
+    .tab button.active {
+        border-bottom: 3px solid black ;
+        
+    }
+    
+    /* Style the content panes */
+    .tabcontent {
+        display: none;
+        
+    }
+    
+    /* Show the active tab content */
+    .tabcontent.active {
+        display: block;
+    }
+</style>
+
+{% if error %}
+<div id="popupContainer" class="popup">
+    <div class="popup-content d-flex flex-column justify-content-center align-items-center gap-4 fw-bold">
+        
+        <p class="text-center">{{error}}</p>
+        <button class="main-btn " id="closeButton" >Close</button>
+    </div>
+</div>
+{% endif %}
+<p id = "hidden_channels_status" style = "display : none" >[{{channels_status.0.1}},{{channels_status.1.1}},{{channels_status.2.1}},{{channels_status.3.1}}]</p>
+<p id = "auto_corrector_status" style = "display : none"  > {{to_be_corrected_channels}}</p>
+<p  id = "is_saving_running" style = "display : none"  >{{isSavingRunning}}</p>
+<div class = "text-center mt-3"> <h1> <span style = "font-weight : 700">  Rohde & Schwarz </span> HMP4040</h1></div>
+<div class =  "text-center mt-3 text-muted"> <h4> IP Address : {{ip}}</h4></div>
+
+    <div class="row mt-3 align-items-center  justify-content-center">       
+        <div class="col-3 ">
+            <form method = "POST">
+              {% csrf_token %}
+              <input id = "zyklus"style = "width:45%" type="text" name = 'zyklus' placeholder = "Zykluszeit in s" value = "{{zyklus}}">
+              <button class="main-btn " id="updateZyklus" style = "margin-left : 20px" type = "submit">aktualisieren</button>
+            </form>
+        </div> 
+        <div class="col-2">
+            <input type="checkbox" id="data_speichern" name = 'data_speichern' >
+
+            <label class = "checkbox-label"for="data_speichern">Data Speichern</label>
+        </div> 
+        <div class="col-2">
+            {% if out %}
+            
+            <input type="checkbox" id="out" name = 'out_status' checked>
+            
+            {% else %}
+            <input type="checkbox" id="out" name = 'out_status' >
+            {% endif %}  
+            <label class = "checkbox-label"for="out">OUTPUT</label>
+        </div>
+    </div>
+    <div class="tab justify-content-center d-flex gap-3 mt-3">
+        <button class="tablinks active " onclick="openTab(event, 'tab1') " id = "übersicht">Übersicht</button>
+        <button class="tablinks" onclick="openTab(event, 'tab2')" id = "Spektrometer">Spektrometer</button>
+    </div>
+    <div id="tab1" class="tabcontent" style="display: block;">
+        <div class="row mt-5 align-items-center  justify-content-center gap-5">       
+            <div class="col-2 d-felx flex-column channel-card gap-3 text-center">
+    
+                {% if channels_status.0.1 %}
+                <input type="checkbox" id="ch1" name = 'ch1_status' checked>
+                {% else %}
+                <input type="checkbox" id="ch1" name = 'ch1_status' >
+                {% endif %}
+                
+                <label class = "checkbox-label" style = "font-weight : 600; font-size : 1.5rem" for="ch1">Kanal 1</label>
+                <p id = "v_ch1"> 32.000 <span style = "font-weight : 500; margin-left:10px">V</span></p>
+                <p id = "I_ch1">  10.000 <span style = "font-weight : 500; margin-left:10px">A</span></p>
+                <p id = "P_ch1"> 320.000 <span style = "font-weight : 500; margin-left:10px">W</span></p>
+                <input type="text" id="sollwert_1" style = "width:90%" placeholder = "Sollwert eingeben" value = "{{channels_power.1}}">
+                <input type="checkbox" id="auto_korrektur1"  >
+                <label class = "checkbox-label mt-2"for="auto_korrektur1" class = "mt-3"> Leistung anpassen</label>
+            </div>
+            <div class="col-2 d-felx flex-column channel-card gap-3 text-center">
+                {% if channels_status.1.1 %}
+                <input type="checkbox" id="ch2" name = 'ch2_status' checked>
+                
+                {% else %}
+                <input type="checkbox" id="ch2" name = 'ch2_status' >
+                {% endif %}
+                
+                <label class = "checkbox-label" style = "font-weight : 600; font-size : 1.5rem" for="ch2">Kanal 2</label>
+                <p id = "v_ch2">  32.000 <span style = "font-weight : 500; margin-left:10px">V</span></p>
+                <p id = "I_ch2">  10.000 <span style = "font-weight : 500; margin-left:10px">A</span></p>
+                <p id = "P_ch2">  320.000 <span style = "font-weight : 500; margin-left:10px">W</span></p>
+                <input type="text" id="sollwert_2" style = "width:90%" placeholder = "Sollwerteingeben" value = "{{channels_power.2}}">
+                <input type="checkbox" id="auto_korrektur2"  >
+                <label class = "checkbox-label mt-2"for="auto_korrektur2" class = "mt-3"> Leistung anpassen</label>
+            </div>
+            <div class="col-2 d-felx flex-column channel-card gap-3 text-center">
+                {% if channels_status.2.1 %}
+                <input type="checkbox" id="ch3" name = 'ch3_status' checked>
+                {% else %}
+                <input type="checkbox" id="ch3" name = 'ch3_status' >
+                {% endif %}
+                
+                <label class = "checkbox-label" style = "font-weight : 600; font-size : 1.5rem" for="ch3">Kanal 3</label>
+                            <p id = "v_ch3" > 32.000 <span style = "font-weight : 500; margin-left:10px">V</span></p>
+                <p id = "I_ch3"> 10.000 <span style = "font-weight : 500; margin-left:10px">A</span></p>
+                <p id = "P_ch3"> 320.000 <span style = "font-weight : 500; margin-left:10px">W</span></p>
+                <input type="text" id="sollwert_3" style = "width:90%" placeholder = "Sollwert eingeben" value = "{{channels_power.3}}">
+                <input type="checkbox" id="auto_korrektur3" >
+                <label class = "checkbox-label mt-2"for="auto_korrektur3" class = "mt-3"> Leistung anpassen</label>
+            </div>
+            <div class="col-2 d-felx flex-column channel-card gap-3 text-center">
+                {% if channels_status.3.1 %}
+                <input type="checkbox" id="ch4" name = 'ch4_status' checked>
+                {% else %}
+                <input type="checkbox" id="ch4" name = 'ch4_status' >
+                {% endif %}
+                
+                <label class = "checkbox-label" style = "font-weight : 600; font-size : 1.5rem" for="ch4">Kanal 4</label>
+                <p id = "v_ch4"> 32.000 <span style = "font-weight : 500; margin-left:10px">V</span></p>
+                <p id = "I_ch4"> 10.000 <span style = "font-weight : 500; margin-left:10px">A</span></p>
+                <p id = "P_ch4"> 320.000 <span style = "font-weight : 500; margin-left:10px">W</span></p>
+                <input type="text" id="sollwert_4" style = "width:90%" placeholder = "Sollwert eingeben" value = "{{channels_power.4}}">
+                <input type="checkbox" id="auto_korrektur4"  >
+                <label class = "checkbox-label mt-2"for="auto_korrektur4" class = "mt-3"> Leistung anpassen</label>
+            </div>
+            </div>
+    </div>
+    <div id="tab2" class="tabcontent">
+        
+            <div class = "d-flex flex-column mt-4  align-items-center justify-content-center gap-3">  
+                <div class="row align-items-center w-75">
+                    <label style="margin-right: 20px;"  class="col-md-2 offset-md-3" > Unterverzeichnis*</label>
+                    <input type="text"  class="col-md-4 " id = "unterverzeichnis" placeholder="Unterverzeichnis eingeben" value = "test1">
+                </div>
+                <div class="row align-items-center w-75">
+                    <label style="margin-right: 20px;"  class="col-md-2 offset-md-3 " >Strahlertyp*</label>
+                    <input   class="col-md-4 " id="strahlertyp" placeholder="Strahlertyp eingeben"  value = "test1">
+                </div>
+                <div class="row align-items-center w-75">
+                    <label style="margin-right: 20px;"  class="col-md-2 offset-md-3" >Strahlernummer*</label>
+                    <input  class="col-md-4 " id="strahlernummer" placeholder="Strahlernummer eingeben"  value = "test1234">
+                </div>
+                <div class="row align-items-center w-75">
+                    <label style="margin-right: 20px;"  class="col-md-2 offset-md-3"  value = "5" >Soll Leistung*</label>
+                    <input type="text"  class="col-md-4 " id="soll_leistung" placeholder="Soll Leistung in W eingeben">
+                </div>
+                <div class="row align-items-center w-75">
+                    <label style="margin-right: 20px;"  class="col-md-2 offset-md-3" >Komment</label>
+                    <input type="text"  class="col-md-4 " id="komment" placeholder="Komment hinzufügen"  value = "test comment">
+                </div>
+                <div class="d-flex just-conntent-center align-items-center mt-2 " >
+                    <button type="submit" class="main-btn" id="messen-btn">Messen</button>
+                    <p style="margin-left: 20px;font-weight: 600;" id="status" ></p>
+                </div>
+            </div>
+            
+         
+        
+       
+    </div>
+<form method = "POST">
+    {% csrf_token %}
+    
+        
+   
+    <div class = "d-flex gap-3 mt-4 justify-content-center">
+        <label class="custom-radio">
+            <input type="radio" name="custom-radio-group" value = "V">
+            <div class="radio-button text-center">
+                <h1 style = "font-weight:700 ;width : 100%">U</h1>
+                <p>Spannung</p>
+            </div>
+             
+          </label>
+          
+          <label class="custom-radio">
+            <input type="radio" name="custom-radio-group" value = "A">
+            <div class="radio-button text-center"> 
+                <h1 style = "font-weight:700 ;width : 100%">I</h1>
+                <p>Strom</p></div>
+          </label>
+          <label class="custom-radio">
+            <input type="radio" name="custom-radio-group" value = "W">
+            <div class="radio-button text-center"> 
+                <h1 style = "font-weight:700 ;width : 100%">P</h1>
+                <p>Leistung</p></div>
+          </label>
+          <div class = "justify-content-center d-flex flex-column">
+            <input type="checkbox" id="s_ch1" name = 'sel_ch1' >
+            <label class = "checkbox-label"for="s_ch1">Kanal 1</label>
+            <input type="checkbox" id="s_ch2" name = 'sel_ch2' >
+            <label class = "checkbox-label"for="s_ch2">Kanal 2</label>
+            <input type="checkbox" id="s_ch3" name = 'sel_ch3' >
+            <label class = "checkbox-label"for="s_ch3">Kanal 3</label>
+            <input type="checkbox" id="s_ch4" name = 'sel_ch4' >
+            <label class = "checkbox-label"for="s_ch4">Kanal 4</label>
+            
+          </div>
+          <label class="custom-radio" style = "margin-left :20px">
+            <input type="text" name="value" placeholder = "Wert eingeben">
+          </label>
+    </div>
+    <div class = "d-flex gap-3 mt-5 justify-content-center">
+        <div class = "sec-btn d-flex justify-content-center align-items-center  " id = "checkButton" >zurücksetzen </div>
+        <button class = "main-btn " type = "submit"> senden</button>
+    </div >
+</form>
+<script src = "{% static 'js/hmp4040.js' %}"  ></script>
+<script>
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+    
+        // Hide all tab content
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+    
+        // Deactivate all tab buttons
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+    
+        // Show the selected tab content and mark the button as active
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+    
+    function updateStatus() {
+        // Check if the input string has at least 4 characters
+        inputString = document.getElementById("strahlernummer").value;
+        if (inputString.length < 4) {
+          return "Input string is too short";
+        }
+      
+        // Get the last 4 characters of the string
+        const last4Characters = inputString.slice(-4);
+      
+        // Convert the last 4 characters to an integer and add 1
+        const last4Int = parseInt(last4Characters, 10);
+        const modifiedInt = last4Int + 1;
+      
+        // Remove the last 4 characters from the original string
+        const stringWithoutLast4 = inputString.slice(0, -4);
+      
+        // Concatenate the modified integer to the string
+        const modifiedString = stringWithoutLast4 + modifiedInt;
+        console.log(modifiedString)
+        document.getElementById("strahlernummer").value = modifiedString
+      }
+
+      function setPowerReq(ip, ch, power) {
+        // Prepare the data to be sent in the POST request
+        var data = {
+            ip: ip,
+            ch: ch,
+            power: power
+        };
+    
+        // Perform the POST request using the Fetch API or another library of your choice
+        return fetch("/api/set_power/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+    
+    }
+
+      
+      // Function to send a request to read voltage
+      function readVoltageReq(ip) {
+        return fetch(`/api/read_volt/?ip=${ip}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to read voltage');
+          }
+          return response.json(); // Assuming the response contains JSON data
+        });
+      }
+      
+      // Function to send a 'GET' request to read current
+      function readCurrentReq(ip) {
+        return fetch(`/api/read_curr/?ip=${ip}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to read voltage');
+
+          }
+          return response.json(); // Assuming the response contains JSON data
+        });
+      }
+
+      function checkProgress() {
+        const url = '/api/progressbar/';
+        let interval; // Declare the interval variable outside the setTimeout and fetchData functions
+        function handleResponse(responseText) {
+          console.log(responseText)
+          const progress = parseInt(responseText, 10); // Parse the response as an integer
+          const status = document.getElementById('status');
+
+          if (progress === 0) {
+            clearInterval(interval); // Stop the interval when progress is 0
+            updateStatus(); // Call your "tsss" function
+            status.textContent = "Messugn fertig."
+          }
+          else {
+            status.textContent = "Messugn läuft " + progress + "%."
+
+          }
+        }
+      
+        function fetchData() {
+          fetch(url)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then(data => {
+              handleResponse(data["prog"]);
+            })
+            .catch(error => {
+              console.error('An error occurred:', error);
+            });
+        }
+      
+        setTimeout(() => {
+            interval = setInterval(fetchData, 1000); // Check progress every 2.5 seconds
+            }, 5000);// Check progress every 0.5 seconds
+      }
+
+      function scannReq(unterverzeichnis,strahlertyp,strahlernummer,soll_leistung,volt,curr,comment) {
+        const url = `http://localhost/OpusCommand.htm?COMMAND_LINE=MeasureSample(,{EXP=EXP_TR.xpm,XPP='C:\\Users\\Public\\Documents\\Bruker\\OPUS_8.1.29\\XPM',NSS=16,SFM='${strahlertyp}_${soll_leistung}W_${volt}V_${curr}mA_${strahlernummer}_${comment}',',PTH='C:\\Messdaten\\OPUS-Rohspektren\\${unterverzeichnis}\\' })`;
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.text(); // or use response.json() if the response is JSON
+            })
+            .then(data => {
+                // Handle the response data here
+                console.log('Response:', data);
+            })
+            .catch(error => {
+                // Handle any errors that may occur during the request
+                console.error('An error occurred:', error);
+            });
+      }
+
+    let voltage
+    let current 
+
+    function sendScanRequest(unterverzeichnis, strahlertyp, strahlernummer, soll_leistung, comment) {
+        // URL to send the POST request to
+        const url = '/api/scan/'; // Replace with your actual API endpoint
+    
+        // Request payload
+        const data = {
+            ip : ipAddress,
+            unterverzeichnis: unterverzeichnis,
+            strahlertyp: strahlertyp,
+            strahlernummer: strahlernummer,
+            soll_leistung: soll_leistung,
+            comment : comment
+            
+        };
+    
+        // Options for the fetch function
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Specify the content type as JSON
+                // Add any other headers if needed
+            },
+            body: JSON.stringify(data) // Convert the data object to JSON
+        };
+    
+        // Use the fetch function to send the POST request
+        return fetch(url, options)
+            .then(response => {
+                // Check if the response status is in the range 200-299 (indicating success)
+                if (response.ok) {
+                    return response.json(); // Parse the JSON in the response
+                } else {
+                    throw new Error(`Error: ${response.status} - ${response.statusText}`);
+                }
+            })
+            .then(data => {
+                console.log('POST request successful:', data);
+                // Handle the response data as needed
+            })
+            .catch(error => {
+                console.error('Error sending POST request:', error);
+                // Handle the error as needed
+            });
+    }
+
+      document.getElementById('messen-btn').addEventListener('click', function() {
+        // Get input values
+        const unterverzeichnis = document.getElementById('unterverzeichnis').value;
+        const strahlernummer = document.getElementById('strahlernummer').value;
+        const strahlertyp = document.getElementById('strahlertyp').value;
+        const soll_leistung = document.getElementById('soll_leistung').value;
+        const comment = document.getElementById('komment').value;
+
+        // Construct the URL with input values
+
+     
+        document.getElementById('status').textContent = 'Messugn läuft ...'
+        sendScanRequest(unterverzeichnis,strahlertyp,strahlernummer,soll_leistung,comment)
+        .then(() => {
+          checkProgress()
+            })
+        
+      });
+      
+</script>
+{% endblock container %}

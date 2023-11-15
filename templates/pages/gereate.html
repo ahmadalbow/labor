@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block container %}
+
+<div class = "d-flex justify-content-center mt-5"> <h1 class = > Aktuell angeschlossene Geräte  .... </h1></div>
+<div class="row gap-5 mt-5 p-5 align-items-center  justify-content-center">
+    
+
+    {% for g in AG  %}
+    {% if g.0 == 'HMP4040'  %}
+        <a href="HMP4040/{{g.1}}" class = "col-4 gereate-card align-items-center d-flex flex-column p-1 ">
+            <img src="{%static 'image/hmp4040.jpg'%}"  alt="">
+                <div class = "text-center mt-3"> <span style = "font-weight:700">Rohde & Schwarz  </span>HMP4040</div>
+                <p class = 'text-muted mt-2'> ip address :  {{g.1}}</p>
+        </a>
+    {% elif g.0 == 'DMM6500' %}
+    <div class="col-4 gereate-card align-items-center d-flex flex-column p-1">
+        <img src="{%static 'image/dmm6500.png'%}" alt="">
+        <div class = "text-center mt-3"> <span style = "font-weight:700">Keithley  </span>DMM6500</div>
+        <p class = 'text-muted mt-2'> ip address :  {{g.1}}</p>
+    </div>
+    {% elif g.0 == 'JDS6600' %}
+    <div class="col-4 gereate-card align-items-center d-flex flex-column p-1">
+        <img src="{%static 'image/JDS6600.png'%}"alt="">
+        <div class = "text-center mt-3"> <span style = "font-weight:700">JOY-IT   </span>JDS6600</div>
+        <p class = 'text-muted mt-2'> usb :  {{g.1}}</p>
+    </div>
+    {% endif %}
+    {% endfor %}
+    
+    
+</div>
+{% endblock container %}

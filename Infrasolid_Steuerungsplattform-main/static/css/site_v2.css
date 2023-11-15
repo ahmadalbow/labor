@@ -1,0 +1,199 @@
+body{
+    font-family: 'Inter', sans-serif;
+}
+
+
+/* Nav start */
+
+.navbar-brand{
+    font-weight: 700;
+    font-size: 2rem;
+}
+
+a{
+    text-decoration: none;
+    color: black;
+}
+.navbar{
+height: 86px;
+}
+
+.nav-item a{
+    font-weight: 600 !important;
+}
+/* Nav end */
+
+/* Landing start */
+
+.landing{
+    height: calc(100vh - 86px);
+}
+
+.landing img{
+    height: calc(100vh - 86px);
+    width: 100%;
+    object-fit:cover;
+}
+.landing .black{
+    height: calc(100vh - 86px);
+    width: 100%;
+    background-color: black;
+    opacity: 0.85;
+    position: absolute;
+    
+
+}
+
+
+
+.landing .container{
+    padding-top: 10%;
+}
+
+.radius {
+    width: fit-content !important;
+    overflow: hidden;
+  }
+  
+  .gradient-border-bg {
+    border: 2.5px solid;
+    border-image: linear-gradient(45deg, purple, orange) 1;
+    padding: 1rem;
+  }
+
+.landing a{
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+    
+}
+/* Landing end */
+ 
+/* Gereater start*/
+
+.gereate-card {
+    box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+    border-radius: 10px;
+}
+.gereate-card img{
+    width: 300px;
+    height: 170px;
+}
+
+/* Gereater end*/
+
+/* HMP4040 Start */
+.checkbox-label {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Style the custom checkbox */
+  .checkbox-label::before {
+    content: "";
+    display: inline-block;
+    font-size: 1rem;
+    width: 18px; /* Adjust the width and height to your preference */
+    height: 18px;
+    border: 2px solid black; /* Change the border style and color */
+    border-radius: 2px; /* Add rounded corners if desired */
+    margin-right: 10px; /* Add some space between the checkbox and label text */
+  }
+  
+  /* Style the checkbox when it's checked */
+  input[type="checkbox"]:checked + label::before {
+    background-color: black; /* Change the background color when checked */
+    border-color: #000000; /* Change the border color when checked */
+    content: "\2713"; /* Unicode checkmark symbol */
+    color : white; 
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  p{
+    margin: 0;
+    padding: 0.4rem;
+  }
+  /* Hide the default checkbox */
+  
+  input[type="checkbox"] {
+    display: none;
+  }
+
+  .channel-card {
+    border-radius: 10px;
+    border : 2.5px solid black;
+    padding: 15px;
+  }
+
+
+  /* Hide the default radio button */
+.custom-radio input[type="radio"] {
+    display: none;
+  }
+  .custom-radio::before input[type="radio"] {
+    display: none;
+  }
+  /* Style the radio button container */
+  .custom-radio {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  
+  /* Style the radio button */
+  .radio-button {
+    width: 110px;
+    height: 110px;
+    padding: 10px;
+    border: 2px solid black;
+    border-radius: 10px;
+    margin-right: 10px;
+    position: relative;
+    
+  }
+  
+  /* Style the inner div for selection */
+ 
+  
+  /* Style the radio button when it's checked */
+  .custom-radio input[type="radio"]:checked + .radio-button {
+    color: white;
+    background-color: black;
+  }
+
+  input{
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: 5px 5px 5px 15px;
+    
+  }
+  input:focus{
+    outline: none;
+  }
+  
+  .main-btn{
+    background-color: #000000;
+    color: white;
+    height: 36px;
+    width: 130px;
+        text-align: center;
+    border: 2px solid black;
+    border-radius: 5px;
+
+  }
+  .sec-btn{
+    background-color: white;
+    color: black;
+    border: 2px solid black;
+    border-radius: 5px;
+    height: 36px;
+    width: 130px;
+    text-align: center;
+  }
+/* HMP4040 End */
