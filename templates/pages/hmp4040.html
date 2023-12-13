@@ -52,6 +52,18 @@
     .tabcontent.active {
         display: block;
     }
+    .main-btn {
+   
+    border : none;
+  }
+    .main-btn:disabled {
+    background-color: #878787; 
+    border : none;
+  }
+  .main-btn:hover {
+    background-color: #2e2e2e; 
+    
+  }
 </style>
 
 {% if error %}
@@ -243,7 +255,12 @@
         <button class = "main-btn " type = "submit"> senden</button>
     </div >
 </form>
+
+
+{% csrf_token %}
 <script src = "{% static 'js/hmp4040.js' %}"  ></script>
+
+{% csrf_token %}
 <script>
     function openTab(evt, tabName) {
         var i, tabcontent, tablinks;
@@ -283,7 +300,7 @@
         const stringWithoutLast4 = inputString.slice(0, -4);
       
         // Concatenate the modified integer to the string
-        const modifiedString = stringWithoutLast4 + modifiedInt;
+        const modifiedString = stringWithoutLast4 + String(modifiedInt).padStart(4, '0');
         console.log(modifiedString)
         document.getElementById("strahlernummer").value = modifiedString
       }
@@ -389,6 +406,7 @@
             updateStatus(); // Call your "tsss" function
             setVoltReq(ipAddress,1,0.1)
             status.textContent = "Messung fertig."
+            document.getElementById('messen-btn').disabled = false
           }
           
           else {
@@ -481,7 +499,7 @@
         const strahlertyp = document.getElementById('strahlertyp').value;
         const soll_leistung = document.getElementById('soll_leistung').value;
         const comment = document.getElementById('komment').value;
-
+        this.disabled = true; 
         if (unterverzeichnis === ""){
             document.getElementById('unterverzeichnis').style.borderColor = "red"
             return
@@ -518,7 +536,7 @@
         
 
      
-        document.getElementById('status').textContent = 'Messugn läuft ...'
+        document.getElementById('status').textContent = 'Messung läuft ...'
         sendScanRequest(unterverzeichnis,strahlertyp,strahlernummer,soll_leistung,comment)
         .then(() => {
           checkProgress()

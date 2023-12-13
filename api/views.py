@@ -1,4 +1,6 @@
+import datetime
 import time
+from urllib.parse import quote
 
 import requests
 from rest_framework.response import Response
@@ -11,7 +13,9 @@ from main import main
 import csv
 import os
 import socket
+import shutil
 
+from pages.models import Measurement, MeasurementValues
 @api_view(['GET'])
 def getAngeschlosseneGereate(request):
     return Response(GereateManager.getAngeschlosseneGereate())
@@ -205,6 +209,7 @@ def read_curr(request):
     except json.JSONDecodeError as e:
         return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     
+
 @api_view(['POST'])
 def scan(request):
     try:
@@ -216,16 +221,55 @@ def scan(request):
         strahlernummer = data.get('strahlernummer')
         soll_leistung = data.get('soll_leistung')
         comment = data.get('comment')
-
+        hmp4040.enable_Channel(1)
+        hmp4040.enable_output()
         hmp4040.set_power(1,float(soll_leistung))
         time.sleep(1)
         voltage =  round(hmp4040.read_volt(1), 2)
         current =  round(1000*hmp4040.read_curr(1), 1)
 
-        url = f'http://localhost/OpusCommand.htm?COMMAND_LINE MeasureSample (,{{EXP= EXP_TR_an.xpm,XPP=\'C:\\Users\\Public\\Documents\\Bruker\\OPUS_8.1.29\\XPM\',NSS=16,SFM=\'{strahlertyp}_{soll_leistung}W_{voltage}V_{current}mA_{strahlernummer}_{comment}\',PTH=\'C:\\Messdaten\\OPUS-Rohspektren\\{unterverzeichnis}\\\' }});'
+        formatted_date = datetime.datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
+        fileName = f"{formatted_date}_{strahlertyp}_{soll_leistung}W_{voltage}V_{current}mA_{strahlernummer}_{comment}"
+        url = f'http://localhost/OpusCommand.htm?COMMAND_LINE MeasureSample (,{{EXP= EXP_TR_an.xpm,XPP=\'C:\\Users\\Public\\Documents\\Bruker\\OPUS_8.1.29\\XPM\',NSS=16,SFM=\'{fileName}\',PTH=\'C:\\Users\\i40014683\\Endress+Hauser\\Infrasolid GmbH - Documents\\07_Produktion\\13_Prozessdaten\\03_FTIR\\{unterverzeichnis}\\\' }});'
         send_post_request(url)
                 # Process the data as needed
+        source_folder = f'C:/Users/i40014683/Endress+Hauser/Infrasolid GmbH - Documents/07_Produktion/13_Prozessdaten/03_FTIR/{unterverzeichnis}/'
+        temp_folder = 'C:/temp/test/'
+        
+        new_measurement = Measurement(
+            date=datetime.datetime.now(),
+            type=strahlertyp,
+            set_power_W=soll_leistung,
+            current_mA=current,
+            voltage_V=voltage,
+            serial_number=strahlernummer,
+            comment=comment,
+        )
 
+        time.sleep(6)
+
+        while(get_progress() != 0):
+            print(get_progress())
+            time.sleep(1)
+        print("creating files started")
+        hmp4040.disable_output()
+        originalFile = source_folder + fileName + ".0"
+        UnloadAll()
+        time.sleep(0.2)
+        shutil.copy(originalFile, temp_folder)
+        runMacroReq()
+        time.sleep(0.2)
+        dptTempFile = temp_folder + fileName + ".0.dpt"
+        originalTempFile = temp_folder + fileName + ".0"
+        shutil.copy(dptTempFile, source_folder)   
+        time.sleep(0.2)
+        deleteFile(dptTempFile)
+        deleteFile(originalTempFile)
+        originalDptFile = originalFile + ".dpt"
+        new_measurement.save()
+
+        import_measurement_values(originalDptFile,new_measurement)
+        print("scan finished")
         response_data = {}
         return JsonResponse(response_data, status=200)
     except json.JSONDecodeError as e:
@@ -288,3 +332,54 @@ def get_url_data(host, port, path):
     except socket.error as e:
         print(f"Socket error: {e}")
 
+def runMacroReq(): 
+    macro_file_name = 'test.mtx'
+    macro_path = 'C:\\Users\\Public\\Documents\\Bruker\\OPUS_8.1.29\\Macro'
+
+# Encode the URL parameters
+    encoded_macro_file_name = quote(macro_file_name)
+    encoded_macro_path = quote(macro_path)
+    url = f'http://localhost/OpusCommand.htm?COMMAND_LINE RunMacro (,MFN = \'{encoded_macro_file_name}\',MPT = \'{encoded_macro_path}\')'
+    send_post_request(url)
+
+def UnloadAll(): 
+    url = f'http://localhost/OpusCommand.htm?COMMAND_LINE UnLoadAll (,)'
+    send_post_request(url)
+
+def deleteFile(file_to_delete): 
+    
+# If file exists, delete it.
+    if os.path.isfile(file_to_delete):
+        os.remove(file_to_delete)
+    else:
+    # If it fails, inform the user.
+        print("Error: %s file not found" % file_to_delete)
+    
+def get_progress():
+    try:
+        url = '127.0.0.1'
+        port = 80
+        path = '/OpusCommand.htm?GET_PROGRESSBAR'
+        prog = get_url_data(url, port, path).split('\n')[2].replace("\r", "")
+        response_data = {'prog' : prog}
+        return float(prog)
+
+    except json.JSONDecodeError as e:
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    
+
+def import_measurement_values(file_path, measurement_instance):
+    with open(file_path, 'r') as file:
+        for line in file:
+            # Split the line into wavelength and amplitude
+            wavelength, amplitude = map(float, line.strip().split())
+
+            # Create MeasurementValues object
+            measurement_values = MeasurementValues(
+                wavelength=wavelength,
+                amplitude=amplitude,
+                measurement=measurement_instance,
+            )
+
+            # Save the object to the database
+            measurement_values.save()

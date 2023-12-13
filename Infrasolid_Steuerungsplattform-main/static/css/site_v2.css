@@ -187,6 +187,10 @@ height: 86px;
     border-radius: 5px;
 
   }
+
+  .main-btn:disabled {
+    background-color: #878787; /* Light gray */
+  }
   .sec-btn{
     background-color: white;
     color: black;

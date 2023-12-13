@@ -35,7 +35,8 @@ class GereateManager:
            results = list(executor.map(GereateManager.is_device_connected, ip_addresses))
            connected_ip_addresses = [ip for ip, result in zip(ip_addresses, results) if result]
            for r in connected_ip_addresses:
-               result.append(('HMP4040',r))
+               result.append(('HMP4040',r)) 
+        
            ip_addresses = ['10.10.0.' + str(i) for i in range(5, 11)]
            results = list(executor.map(GereateManager.is_device_connected, ip_addresses))
            connected_ip_addresses = [ip for ip, result in zip(ip_addresses, results) if result]
