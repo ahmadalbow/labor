@@ -80,9 +80,17 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
-    }
+    },
+    'mysql_db': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'FTIR',
+        'USER': 'burnin_admin',
+        'PASSWORD': 'Labor.123',
+        'HOST': '172.16.0.163',  # Set to empty string for localhost.
+        'PORT': '3306',  # Set to empty string for default.
+    },
 }
-
+DATABASE_ROUTERS = ['MyDatabaseRouter.MyDatabaseRouter']
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

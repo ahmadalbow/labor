@@ -266,7 +266,7 @@ def scan(request):
         deleteFile(dptTempFile)
         deleteFile(originalTempFile)
         originalDptFile = originalFile + ".dpt"
-        new_measurement.save()
+        new_measurement.save(using='mysql_db')
 
         import_measurement_values(originalDptFile,new_measurement)
         print("scan finished")
@@ -382,4 +382,4 @@ def import_measurement_values(file_path, measurement_instance):
             )
 
             # Save the object to the database
-            measurement_values.save()
+            measurement_values.save(using='mysql_db')
