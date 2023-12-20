@@ -369,17 +369,23 @@ def get_progress():
     
 
 def import_measurement_values(file_path, measurement_instance):
+    measurement_values_list = []
+
     with open(file_path, 'r') as file:
         for line in file:
-            # Split the line into wavelength and amplitude
             wavelength, amplitude = map(float, line.strip().split())
-
-            # Create MeasurementValues object
-            measurement_values = MeasurementValues(
+            measurement_values_list.append(MeasurementValues(
                 wavelength=wavelength,
                 amplitude=amplitude,
                 measurement=measurement_instance,
-            )
+            ))
 
-            # Save the object to the database
-            measurement_values.save(using='mysql_db')
+            # Save in batches, e.g., every 1000 records
+            if len(measurement_values_list) >= 1000:
+                MeasurementValues.objects.bulk_create(measurement_values_list)
+                measurement_values_list = []
+                print(1000)
+
+    # Save any remaining records
+    if measurement_values_list:
+        MeasurementValues.objects.bulk_create(measurement_values_list)

@@ -16,5 +16,6 @@ class MeasurementValues(models.Model):
     
     # Foreign key to the Measurement model
     measurement = models.ForeignKey(Measurement, on_delete=models.CASCADE, related_name='measurement_values')
+
     def __str__(self):
         return f'{self.wavelength} - {self.amplitude}' 
