@@ -209,7 +209,14 @@ def read_curr(request):
     except json.JSONDecodeError as e:
         return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     
-
+def get_windows_username():
+    try:
+        # Get the username from the environment variables
+        username = os.environ['USERNAME']
+        return username
+    except KeyError:
+        # Handle the case where the 'USERNAME' environment variable is not defined
+        return None
 @api_view(['POST'])
 def scan(request):
     try:
@@ -230,10 +237,10 @@ def scan(request):
 
         formatted_date = datetime.datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
         fileName = f"{formatted_date}_{strahlertyp}_{soll_leistung}W_{voltage}V_{current}mA_{strahlernummer}_{comment}"
-        url = f'http://localhost/OpusCommand.htm?COMMAND_LINE MeasureSample (,{{EXP= EXP_TR_an.xpm,XPP=\'C:\\Users\\Public\\Documents\\Bruker\\OPUS_8.1.29\\XPM\',NSS=16,SFM=\'{fileName}\',PTH=\'C:\\Users\\i40014683\\Endress+Hauser\\Infrasolid GmbH - Documents\\07_Produktion\\13_Prozessdaten\\03_FTIR\\{unterverzeichnis}\\\' }});'
+        url = f'http://localhost/OpusCommand.htm?COMMAND_LINE MeasureSample (,{{EXP= EXP_TR_an.xpm,XPP=\'C:\\Users\\Public\\Documents\\Bruker\\OPUS_8.1.29\\XPM\',NSS=16,SFM=\'{fileName}\',PTH=\'C:\\Users\\{get_windows_username()}\\Endress+Hauser\\Infrasolid GmbH - Documents\\07_Produktion\\13_Prozessdaten\\03_FTIR\\{unterverzeichnis}\\\' }});'
         send_post_request(url)
                 # Process the data as needed
-        source_folder = f'C:/Users/i40014683/Endress+Hauser/Infrasolid GmbH - Documents/07_Produktion/13_Prozessdaten/03_FTIR/{unterverzeichnis}/'
+        source_folder = f'C:/Users/{get_windows_username()}/Endress+Hauser/Infrasolid GmbH - Documents/07_Produktion/13_Prozessdaten/03_FTIR/{unterverzeichnis}/'
         temp_folder = 'C:/temp/test/'
         
         new_measurement = Measurement(
