@@ -52,7 +52,6 @@ function startSavingDataRequest(ip) {
 
     var data = {
         ip: ip
-
     };
 
     // Perform the POST request using the Fetch API or another library of your choice

@@ -5,8 +5,8 @@ from Gereate.GereateManager import GereateManager
 from Gereate.HMP4040 import HMP4040
 from main import main
 import platform
-# Create your views here.
 
+# 
 def index(request):
     os_name = platform.system()
     if os_name == 'Windows':
@@ -66,7 +66,7 @@ def hmp4040(request,ip):
                     break
                 if (i == 3 ):
                     return render(request, 'pages/hmp4040.html',{'ip': ip,'channels_status' : hmp4040.get_channels_satus(),'out' : hmp4040.get_output_status(),"to_be_corrected_channels" : to_be_corrected_channels, "isSavingRunning" : hmp4040.is_saving_running,"error" : "Du hast keinen Kanal ausgewählt"})    
-            
+
 
             if value:
                 for ch in selected_channels:
