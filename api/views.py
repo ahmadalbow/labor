@@ -489,7 +489,7 @@ def runMacroReq():
     macro_path = 'C:\\Users\\Public\\Documents\\Bruker\\OPUS_8.1.29\\Macro'  # Define the path to the macro file
     encoded_macro_file_name = quote(macro_file_name)  # URL encode the macro file name
     encoded_macro_path = quote(macro_path)  # URL encode the macro path
-    url = f'http://localhost/OpusCommand.htm?COMMAND_LINE RunMacro (,MFN = \'{encoded_macro_file_name}\',MPT = \'{encoded_macro_path}\')'  # Create the OpusCommand URL
+    url = f'http://localhost/OpusCommand.htm?COMMAND_LINE RunMacro (,{{MFN = \'{encoded_macro_file_name}\',MPT = \'{encoded_macro_path}\'}})'  # Create the OpusCommand URL
     send_post_request(url)  # Send a POST request to run the macro
 
 # Function to unload all data using an OpusCommand URL
