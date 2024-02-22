@@ -237,7 +237,7 @@ def scan(request):
 
         formatted_date = datetime.datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
         fileName = f"{formatted_date}_{strahlertyp}_{soll_leistung}W_{voltage}V_{current}mA_{strahlernummer}_{comment}"
-        url = f'http://localhost/OpusCommand.htm?COMMAND_LINE MeasureSample (,{{EXP= EXP_TR_an.xpm,XPP=\'C:\\Users\\Public\\Documents\\Bruker\\OPUS_8.1.29\\XPM\',NSS=16,SFM=\'{fileName}\',PTH=\'C:\\Users\\{get_windows_username()}\\Endress+Hauser\\Infrasolid GmbH - Documents\\07_Produktion\\13_Prozessdaten\\03_FTIR\\{unterverzeichnis}\\\' }});'
+        url = f'http://localhost/OpusCommand.htm?COMMAND_LINE MeasureSample (,{{EXP= \'EXT_TR_ahmed_tool.xpm\',XPP=\'C:\\Users\\Public\\Documents\\Bruker\\OPUS_8.1.29\\XPM\',NSS=16,SFM=\'{fileName}\',PTH=\'C:\\Users\\{get_windows_username()}\\Endress+Hauser\\Infrasolid GmbH - Documents\\07_Produktion\\13_Prozessdaten\\03_FTIR\\{unterverzeichnis}\\\' }});'
         send_post_request(url)
                 # Process the data as needed
         source_folder = f'C:/Users/{get_windows_username()}/Endress+Hauser/Infrasolid GmbH - Documents/07_Produktion/13_Prozessdaten/03_FTIR/{unterverzeichnis}/'
